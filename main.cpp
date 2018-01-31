@@ -260,13 +260,16 @@ void readFile(string filename){
         line = line.substr(2);
        while(!line.empty()&& line.find(" ")!= std::string::npos){
           float point =  std::stof(line.substr(0,line.find(" "));
+          if(currentIndexFaces == faces.size()-1){
+            currentIndexFaces=resize(currentIndexFaces);
+            }
            faces[currentIndexFaces] = point;
            currentIndexFaces++;
            line.substr(line.find(" ")+1);
          }
       point = std::stof(line);
-      vertex[currentIndexVertex] = point;
-      currentIndexVertex++;
+      vertex[currentIndexFaces] = point;
+      currentIndexFaces++;
 
       }
 
