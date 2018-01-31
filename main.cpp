@@ -14,6 +14,7 @@
 #include <cmath>
 #include <chrono>
 #include <iostream>
+#include <fstream>
 
 // GL
 #if   defined(OSX)
@@ -42,6 +43,13 @@ std::chrono::high_resolution_clock::time_point g_frameTime{
   std::chrono::high_resolution_clock::now()};
 float g_delay{0.f};
 float g_framesPerSecond{0.f};
+GLuint objectVBO;
+static GLfloat *vertex[] = new GLfloat[100];
+int currentIndexVertex;
+static GLfloat *normals[] = new GLfloat[100];
+int currentIndexNormals;
+static GLfloat *faces[]= new GLfloat[100];
+int currentIndexFaces;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Functions
@@ -159,30 +167,6 @@ draw() {
   glVertex3f( 1.f, -1.f,  1.f);
   glVertex3f( 1.f,  1.f,  1.f);
   glVertex3f( 1.f,  1.f, -1.f);
-
-  glEnd();
-
-  glColor3f(0.f, 1.0f, 0.0f);
-  glBegin(GL_TRIANGLES);
-  std::cout << "The Triangle" << std::endl;
-
-  glVertex3f(3.f, 3.f, 3.f);
-  glVertex3f(2.f, 2.f,  2.f);
-  glVertex3f( 3.f,3.f,3.f);
-  
-
-
-  glVertex3f(-1.f,  1.f, -1.f);
-  glVertex3f(-1.f,  1.f,  1.f);
-  glVertex3f( 1.f,  1.f,  1.f);
- 
-
- 
-  glVertex3f(-1.f, -1.f, -1.f);
-  glVertex3f(-1.f,  1.f, -1.f);
-  glVertex3f( 1.f,  1.f, -1.f);
-
-
   
 
   
@@ -245,6 +229,84 @@ specialKeyPressed(GLint _key, GLint _x, GLint _y) {
       break;
   }
 }
+
+
+
+//Read File
+
+void readFile(string filename){
+  ifstream inFile;
+  if(!filename.contains("obj")){
+    cout << "File is not supported please provide an obj file" << endl;
+    system.exit(0);
+  }
+
+  inFile.open(filename.c_str);
+  string line;
+  
+  while (getline(infile,line))
+  {
+    //If it is a comment
+    if(line.charAt(0).compare("#")==0){
+
+    }
+    else if(!line.charAt(0).compare("vn")==0||!line.charAt(0).compare("v")==0||!line.charAt(0).compare("f")==0){
+
+    }
+    else{
+           
+      
+      if(line.charAt(0).compare('f')==0){
+        line = line.substr(2);
+       while(!line.empty()&& line.find(" ")!= std::string::npos){
+          float point =  std::stof(line.substr(0,line.find(" "));
+           faces[currentIndexFaces] = point;
+           currentIndexFaces++;
+           line.substr(line.find(" ")+1);
+         }
+      point = std::stof(line);
+      vertex[currentIndexVertex] = point;
+      currentIndexVertex++;
+
+      }
+
+       //Case for the vertex
+      else if(line.charAt(0).compare('v')==0){
+        line = line.substr(2);
+       while(!line.empty()&& line.find(" ")!= std::string::npos){
+          float point =  std::stof(line.substr(0,line.find(" "));
+           vertex[currentIndexVertex] = point;
+           currentIndexVertex++;
+           line.substr(line.find(" ")+1);
+         }
+      point = std::stof(line);
+      vertex[currentIndexVertex] = point;
+      currentIndexVertex++;
+    }
+
+
+
+    }
+
+  }
+
+    inFile.close();
+}
+
+
+//Resize for the arrays holding the information
+GLfloat [] array resize(GLfloat [] array){
+  int newSize = array.size()*3;
+  GLfloat [] newArray = new GLfloat[newSize];
+
+  memcpy(&newArray, &array, newSize*sizeof(int));
+
+  delete array [];
+
+  return newArray;
+  
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Main
