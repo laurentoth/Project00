@@ -283,6 +283,19 @@ void readFile(string filename){
       vertex[currentIndexVertex] = point;
       currentIndexVertex++;
     }
+    else{
+      line = line.substr(3);
+       while(!line.empty()&& line.find(" ")!= std::string::npos){
+          float point =  std::stof(line.substr(0,line.find(" "));
+           normals[currentIndexNormals] = point;
+           currentIndexNormals++;
+           line.substr(line.find(" ")+1);
+         }
+      point = std::stof(line);
+      vertex[currentIndexNormals] = point;
+      currentIndexNormals++;
+    
+    }
 
 
 
