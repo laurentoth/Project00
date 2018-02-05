@@ -15,6 +15,7 @@
 #include <chrono>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <string>
 #include <vector>
 using namespace std;
@@ -90,12 +91,11 @@ std::chrono::high_resolution_clock::time_point g_frameTime{
   vector <vertex_t> vertex;
   int currentIndexVertex=0;
   vector <normals_t> normals;
-  int currentIndexNormals=1;
-  //static faces_t faces[10000];
+  int currentIndexNormals=0;
   vector<faces_t> faces;
-  int currentIndexFaces=1;
+  int currentIndexFaces=0;
   vector<textures_t >textures;
-  int currentIndexTextures=1;
+  int currentIndexTextures=0;
   int numVertex=0;
   int numIndicies=0;
   bool wireFrame=false; 
@@ -185,38 +185,13 @@ std::chrono::high_resolution_clock::time_point g_frameTime{
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 
-//     //Making the Voa
-//     GLuint vao;
-//     glGenVertexArrays(1,&vao);
-//     glBindVertexArray(vao);
-    
+   
 
-// //Vertex Buffer Object
-//     GLuint vertexBuffer;
-//     glGenBuffers(1,&vertexBuffer);
-//     glBindBuffer(GL_ARRAY_BUFFER,vertexBuffer);
-//     cout << " numVertex: " << numVertex << endl;
-//     glBufferData(GL_ARRAY_BUFFER,numVertex*sizeof(float),vertex, GL_STATIC_DRAW);
-//       glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,0,(void*)0);
-//     glEnableVertexAttribArray(1);
-//     glBindBuffer(GL_ARRAY_BUFFER,vertexBuffer);
-
-//     glDrawArrays(GL_TRIANGLES,1,3);
-//     glDisableVertexAttribArray(0);
-
-//     // glBindVertexArray(vao);
-    
-
-
-    // GLuint indexBufferObject;
-    // glGenBuffers(1,&indexBufferObject);
-    // glBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndicies*sizeof(float),&faces,GL_STATIC_DRAW);
-    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,indexBufferObject);
-    // glBindVertexArray(vao);
-    // glDrawElements(GL_TRIANGLES,numIndicies,GL_UNSIGNED_INT,(void*)0);
     if(wireFrame){
+       glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
       glBegin(GL_LINES);
-      for(int i=1; i<currentIndexFaces; i+=1){
+      for(int i=0; i<currentIndexFaces; i+=1){
+        
         glNormal3f(faces[i].normal.xcoor, faces[i].normal.ycoor,faces[i].normal.zcoor);
         glTexCoord2f(faces[i].texture1.coorOne,faces[i].texture1.coorTwo);
         glVertex3f(faces[i].one.xcoor,faces[i].one.ycoor,faces[i].one.zcoor);
@@ -225,14 +200,18 @@ std::chrono::high_resolution_clock::time_point g_frameTime{
          glTexCoord2f(faces[i].texture3.coorOne,faces[i].texture3.coorTwo);
         glVertex3f(faces[i].three.xcoor,faces[i].three.ycoor,faces[i].three.zcoor);
 
-
+        
+        
       }
-      glEnd();
+       glEnd();
+     
     }
 
     if(pointModel){
-      glBegin(GL_POINTS);
-      for(int i=1; i<numIndicies; i++){
+      glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+       glBegin(GL_POINTS);
+      for(int i=0; i<currentIndexFaces; i++){
+       
            glNormal3f(faces[i].normal.xcoor, faces[i].normal.ycoor,faces[i].normal.zcoor);
         glTexCoord2f(faces[i].texture1.coorOne,faces[i].texture1.coorTwo);
         glVertex3f(faces[i].one.xcoor,faces[i].one.ycoor,faces[i].one.zcoor);
@@ -240,33 +219,28 @@ std::chrono::high_resolution_clock::time_point g_frameTime{
         glVertex3f(faces[i].two.xcoor,faces[i].two.ycoor,faces[i].two.zcoor);
          glTexCoord2f(faces[i].texture3.coorOne,faces[i].texture3.coorTwo);
         glVertex3f(faces[i].three.xcoor,faces[i].three.ycoor,faces[i].three.zcoor);
-
+          
       }
       glEnd();
     }
 
       if(solidModel){
-        glBegin(GL_TRIANGLES);
-        for(int i=1; i<numIndicies; i++){
+         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+         glBegin(GL_TRIANGLES);
+        for(int i=0; i<currentIndexFaces; i++){
+         
             glNormal3f(faces[i].normal.xcoor, faces[i].normal.ycoor,faces[i].normal.zcoor);
-        glTexCoord2f(faces[i].texture1.coorOne,faces[i].texture1.coorTwo);
-        glVertex3f(faces[i].one.xcoor,faces[i].one.ycoor,faces[i].one.zcoor);
-         glTexCoord2f(faces[i].texture2.coorOne,faces[i].texture2.coorTwo);
-        glVertex3f(faces[i].two.xcoor,faces[i].two.ycoor,faces[i].two.zcoor);
-         glTexCoord2f(faces[i].texture3.coorOne,faces[i].texture3.coorTwo);
-        glVertex3f(faces[i].three.xcoor,faces[i].three.ycoor,faces[i].three.zcoor);
+          glTexCoord2f(faces[i].texture1.coorOne,faces[i].texture1.coorTwo);
+         glVertex3f(faces[i].one.xcoor,faces[i].one.ycoor,faces[i].one.zcoor);
+          glTexCoord2f(faces[i].texture2.coorOne,faces[i].texture2.coorTwo);
+         glVertex3f(faces[i].two.xcoor,faces[i].two.ycoor,faces[i].two.zcoor);
+           glTexCoord2f(faces[i].texture3.coorOne,faces[i].texture3.coorTwo);
+          glVertex3f(faces[i].three.xcoor,faces[i].three.ycoor,faces[i].three.zcoor);
 
         }
         glEnd();
 
       }
-
-
-
-
-
-
-
 
   //////////////////////////////////////////////////////////////////////////////
   // Show
@@ -376,7 +350,7 @@ std::chrono::high_resolution_clock::time_point g_frameTime{
 
         inFile.open(filename.c_str());
         string line;
-        float point;
+        GLfloat point;
 
         while (getline(inFile,line))
         {
@@ -409,16 +383,16 @@ std::chrono::high_resolution_clock::time_point g_frameTime{
              normal1 =std::stoi(line.substr(0,line.find(" ")));
 
              line = line.substr(line.find(" ")+1);
-             cout << "vertex: " << vertex1 << "Texture: " << texture1 << "Normal: " << normal1;
+           
 
              if(x==0){
-               newFace.one = vertex[vertex1];
-               newFace.texture1=textures[texture1];
-               newFace.normal=normals[normal1];
+               newFace.one = vertex[vertex1-1];
+               newFace.texture1=textures[texture1-1];
+               newFace.normal=normals[normal1-1];
              }
              if(x==1){
-              newFace.two=vertex[vertex1];
-              newFace.texture2=textures[texture1];
+              newFace.two=vertex[vertex1-1];
+              newFace.texture2=textures[texture1-1];
             }
 
 
@@ -428,15 +402,17 @@ std::chrono::high_resolution_clock::time_point g_frameTime{
           line = line.substr(line.find("/")+1);
           texture1 = std::stoi(line.substr(0,line.find("/")));
           normal1 =std::stoi(line.substr(line.find("/")+1));
+         
 
-          cout << "vertex: " << vertex1 << "Texture: " << texture1 << "Normal: " << normal1 << endl;
-          newFace.three = vertex[vertex1];
-          newFace.texture3=textures[texture1];
+         
+          newFace.three = vertex[vertex1-1];
+          newFace.texture3=textures[texture1-1];
 
 
           faces.push_back(newFace);
           currentIndexFaces++;
           numIndicies++;
+          
 
           
         }
@@ -445,17 +421,11 @@ std::chrono::high_resolution_clock::time_point g_frameTime{
         else if (line.substr(0,2).compare("vt")==0){
           textures_t newText;
           line = line.substr(3);
-
-          point =  std::stof(line.substr(0,line.find(" ")));
-          newText.coorOne = point;
-
-          line.substr(line.find(" ")+1);
-
-          point = std::stof(line);
-          newText.coorTwo = point;
+          std::istringstream in(line);       
+          in>>newText.coorOne;   
+          in>>newText.coorTwo;
           textures.push_back(newText);
           currentIndexTextures++;
-
 
         }
 
@@ -463,19 +433,21 @@ std::chrono::high_resolution_clock::time_point g_frameTime{
         else if (line.substr(0,2).compare("vn")==0){
           normals_t newNormal;
           line = line.substr(3);
+          std::istringstream in(line);
           for(int x=0; x<2; x++){
-            point =  std::stof(line.substr(0,line.find(" ")));
+          
             if(x==0){
-              newNormal.xcoor= point;
+              in >>newNormal.xcoor;
             }
             if(x==1){
-              newNormal.ycoor=point;
+              in >>newNormal.ycoor;
             }
 
-            line.substr(line.find(" ")+1);
+           
           }
-          point = std::stof(line);
-          newNormal.zcoor = point;
+       
+         
+          in>>newNormal.zcoor;
           normals.push_back(newNormal);
           currentIndexNormals++;
 
@@ -485,19 +457,18 @@ std::chrono::high_resolution_clock::time_point g_frameTime{
         else if(line.substr(0,1).compare("v")==0){
           vertex_t newVertex;
           line = line.substr(2);
+          std::istringstream in(line);
           for(int x=0; x< 2; x++){
-            point =  std::stof(line.substr(0,line.find(" ")));
             if(x==0){
-              newVertex.xcoor=point;
+              in>>newVertex.xcoor;
             }
             if(x==1){
-              newVertex.ycoor=point;
-            }
-            line.substr(line.find(" ")+1);
+              in>>newVertex.ycoor;
 
           }
-          point = std::stof(line);
-          newVertex.zcoor=point;
+        }
+         
+          in>>newVertex.zcoor;
           vertex.push_back(newVertex);
           currentIndexVertex++;
           numVertex++;
@@ -506,9 +477,6 @@ std::chrono::high_resolution_clock::time_point g_frameTime{
         else{
           cout << "not a case" << endl;
         }
-
-
-
 
 
       }
@@ -537,7 +505,7 @@ std::chrono::high_resolution_clock::time_point g_frameTime{
     glutInitWindowPosition(50, 100);
   glutInitWindowSize(g_width, g_height); // HD size
   g_window = glutCreateWindow("Spiderling: A Rudamentary Game Engine");
-  readFile("theBench.obj");
+  readFile("skull.obj");
 
   // GL
   initialize();
