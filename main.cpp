@@ -16,6 +16,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <vector>
 using namespace std;
 
 // GL
@@ -33,6 +34,39 @@ using namespace std;
 #endif
 ////////////////////////////////////////////////////////////////////////////////
 // Global variables - avoid these
+
+
+struct vertex_t{
+  float xcoor;
+  float ycoor;
+  float zcoor;
+};
+
+
+
+
+struct normals_t{
+  float xcoor;
+  float ycoor;
+  float zcoor;
+};
+
+struct textures_t{
+  float coorOne;
+  float coorTwo;
+};
+
+
+struct faces_t{
+  vertex_t one;
+  vertex_t two;
+  vertex_t three;
+  normals_t normal;
+  textures_t texture1;
+  textures_t texture2;
+  textures_t texture3;
+};
+
 
 // Window
 int g_width{1360};
@@ -53,13 +87,14 @@ std::chrono::high_resolution_clock::time_point g_frameTime{
 
 
 
-  static GLfloat vertex[1000];
+  vector <vertex_t> vertex;
   int currentIndexVertex=0;
-  static GLfloat normals[10000];
+  vector <normals_t> normals;
   int currentIndexNormals=1;
-  static GLfloat faces[10000];
+  //static faces_t faces[10000];
+  vector<faces_t> faces;
   int currentIndexFaces=1;
-  static GLfloat textures[10000];
+  vector<textures_t >textures;
   int currentIndexTextures=1;
   int numVertex=0;
   int numIndicies=0;
@@ -179,54 +214,93 @@ std::chrono::high_resolution_clock::time_point g_frameTime{
     // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,indexBufferObject);
     // glBindVertexArray(vao);
     // glDrawElements(GL_TRIANGLES,numIndicies,GL_UNSIGNED_INT,(void*)0);
-   if(wireFrame){
-    glBegin(GL_LINES);
-   }
-   
-   if(pointModel){
-    glBegin(GL_POINTS);
-    for(int i=1; i<numIndicies; i+=26){
-      glNormal3f(vertex[i+1],vertex[],vertex[]);
-      glVertex3f(vertex[i],vertex[i+3],vertex[i+6]);
-       glVertex3f(vertex[i+9],vertex[i+12],vertex[i+15]);
-       glVertex3f(vertex[i+18],vertex[i+21],vertex[i+24]);
-
-   }
-   if(solidModel){
-    glBegin(GL_TRIANGLES);
-     for(int i=1; i<numIndicies; i+=26){
-      
-      glVertex3f(vertex[i],vertex[i+3],vertex[i+6]);
-       glVertex3f(vertex[i+9],vertex[i+12],vertex[i+15]);
-       glVertex3f(vertex[i+18],vertex[i+21],vertex[i+24]);
+    if(wireFrame){
+      glBegin(GL_LINES);
+      for(int i=1; i<currentIndexFaces; i+=1){
+        glNormal3f(faces[i].normal.xcoor, faces[i].normal.ycoor,faces[i].normal.zcoor);
+        glTexCoord2f(faces[i].texture1.coorOne,faces[i].texture1.coorTwo);
+        glVertex3f(faces[i].one.xcoor,faces[i].one.ycoor,faces[i].one.zcoor);
+         glTexCoord2f(faces[i].texture2.coorOne,faces[i].texture2.coorTwo);
+        glVertex3f(faces[i].two.xcoor,faces[i].two.ycoor,faces[i].two.zcoor);
+         glTexCoord2f(faces[i].texture3.coorOne,faces[i].texture3.coorTwo);
+        glVertex3f(faces[i].three.xcoor,faces[i].three.ycoor,faces[i].three.zcoor);
 
 
-      cout << "vertex: " << vertex[i-2]<< " " <<vertex[i-1]<<" " <<vertex[i] << endl;
-         glEnd();
-       }
-   }
-   
-   
- 
+      }
+      glEnd();
+    }
 
- 
+    if(pointModel){
+      glBegin(GL_POINTS);
+      for(int i=1; i<numIndicies; i++){
+           glNormal3f(faces[i].normal.xcoor, faces[i].normal.ycoor,faces[i].normal.zcoor);
+        glTexCoord2f(faces[i].texture1.coorOne,faces[i].texture1.coorTwo);
+        glVertex3f(faces[i].one.xcoor,faces[i].one.ycoor,faces[i].one.zcoor);
+         glTexCoord2f(faces[i].texture2.coorOne,faces[i].texture2.coorTwo);
+        glVertex3f(faces[i].two.xcoor,faces[i].two.ycoor,faces[i].two.zcoor);
+         glTexCoord2f(faces[i].texture3.coorOne,faces[i].texture3.coorTwo);
+        glVertex3f(faces[i].three.xcoor,faces[i].three.ycoor,faces[i].three.zcoor);
+
+      }
+      glEnd();
+    }
+
+      if(solidModel){
+        glBegin(GL_TRIANGLES);
+        for(int i=1; i<numIndicies; i++){
+            glNormal3f(faces[i].normal.xcoor, faces[i].normal.ycoor,faces[i].normal.zcoor);
+        glTexCoord2f(faces[i].texture1.coorOne,faces[i].texture1.coorTwo);
+        glVertex3f(faces[i].one.xcoor,faces[i].one.ycoor,faces[i].one.zcoor);
+         glTexCoord2f(faces[i].texture2.coorOne,faces[i].texture2.coorTwo);
+        glVertex3f(faces[i].two.xcoor,faces[i].two.ycoor,faces[i].two.zcoor);
+         glTexCoord2f(faces[i].texture3.coorOne,faces[i].texture3.coorTwo);
+        glVertex3f(faces[i].three.xcoor,faces[i].three.ycoor,faces[i].three.zcoor);
+
+        }
+        glEnd();
+
+      }
+
+
+
+
+
 
 
 
   //////////////////////////////////////////////////////////////////////////////
   // Show
-    glutSwapBuffers();
+      glutSwapBuffers();
 
   //////////////////////////////////////////////////////////////////////////////
   // Record frame time
-    high_resolution_clock::time_point time = high_resolution_clock::now();
-    g_frameRate = duration_cast<duration<float>>(time - g_frameTime).count();
-    g_frameTime = time;
-    g_framesPerSecond = 1.f/(g_delay + g_frameRate);
+      high_resolution_clock::time_point time = high_resolution_clock::now();
+      g_frameRate = duration_cast<duration<float>>(time - g_frameTime).count();
+      g_frameTime = time;
+      g_framesPerSecond = 1.f/(g_delay + g_frameRate);
   //printf("FPS: %6.2f\n", g_framesPerSecond);
 
-  }
+    }
 
+
+
+ void changeToPoints(){
+      wireFrame=false; 
+      pointModel=true;
+      solidModel=false;
+    }
+
+    void changeToWire(){
+      wireFrame=true; 
+      pointModel=false;
+      solidModel=false;
+    }
+
+    void changeToSolid(){
+      wireFrame=false; 
+      pointModel=false;
+      solidModel=true;
+    }
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -234,209 +308,214 @@ std::chrono::high_resolution_clock::time_point g_frameTime{
 /// @param _key Key
 /// @param _x X position of mouse
 /// @param _y Y position of mouse
-  void
-  keyPressed(GLubyte _key, GLint _x, GLint _y) {
-    switch(_key) {
+    void keyPressed(GLubyte _key, GLint _x, GLint _y) {
+      switch(_key) {
     // Escape key : quit application
-      case 27:
-      std::cout << "Destroying window: " << g_window << std::endl;
-      glutDestroyWindow(g_window);
-      g_window = 0;
-      break;
-      case 80:
-      std::cout << "Changing to point model" << endl;
-      changeToPoints();
-      break;
-      
-      case 87:
-      std::cout<<"Changing to WireModel" << endl;
-      changeToWire();
-      break;
-      
-      case 83:
-      std::cout << "Changing to Solid Modle" << endl;
-      changeToSolid();
-      break;
+        case 27:
+        std::cout << "Destroying window: " << g_window << std::endl;
+        glutDestroyWindow(g_window);
+        g_window = 0;
+        break;
+        case 112:
+        std::cout << "Changing to point model" << endl;
+        changeToPoints();
+        break;
+
+        case 119:
+        std::cout<<"Changing to WireModel" << endl;
+        changeToWire();
+        break;
+
+        case 115:
+        std::cout << "Changing to Solid Modle" << endl;
+        changeToSolid();
+        break;
     // Unhandled
-      default:
-      std::cout << "Unhandled key: " << (int)(_key) << std::endl;
-      break;
+        default:
+        std::cout << "Unhandled key: " << (int)(_key) << std::endl;
+        break;
+      }
     }
-  }
 
-void changeToPoints(){
-    wireFrame=false; 
-   pointModel=true;
-   solidModel=false;
-}
-
-void changeToWire(){
-    wireFrame=ture; 
-   pointModel=false;
-   solidModel=false;
-}
-
-void changeToSolid(){
-    wireFrame=false; 
-   pointModel=false;
-   solidModel=true;
-}
+   
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief Callback function for keyboard presses of special keys
 /// @param _key Key
 /// @param _x X position of mouse
 /// @param _y Y position of mouse
-  void
-  specialKeyPressed(GLint _key, GLint _x, GLint _y) {
-    switch(_key) {
+    void
+    specialKeyPressed(GLint _key, GLint _x, GLint _y) {
+      switch(_key) {
     // Arrow keys
-      case GLUT_KEY_LEFT:
-      g_theta -= 0.2;
-      break;
-      case GLUT_KEY_RIGHT:
-      g_theta += 0.2;
-      break;
+        case GLUT_KEY_LEFT:
+        g_theta -= 0.2;
+        break;
+        case GLUT_KEY_RIGHT:
+        g_theta += 0.2;
+        break;
     // Unhandled
-      default:
-      std::cout << "Unhandled special key: " << _key << std::endl;
-      break;
+        default:
+        std::cout << "Unhandled special key: " << _key << std::endl;
+        break;
+      }
     }
-  }
 
 
 
 //Read File
 
-  void readFile(std::string filename){
-    ifstream inFile;
-    faces[0]=0;
-    currentIndexFaces++;
-    if(filename.find("obj") == std::string::npos){
-      cout << "File is not supported please provide an obj file" << endl;
+    void readFile(std::string filename){
+      ifstream inFile;
+     
+      if(filename.find("obj") == std::string::npos){
+        cout << "File is not supported please provide an obj file" << endl;
 
-    }
-    else{
+      }
+      else{
 
-      inFile.open(filename.c_str());
-      string line;
-      float point;
+        inFile.open(filename.c_str());
+        string line;
+        float point;
 
-      while (getline(inFile,line))
-      {
+        while (getline(inFile,line))
+        {
     //If it is a comment
 
-        if(line.substr(0,1).compare("#")==0){
+          if(line.substr(0,1).compare("#")==0){
 
+          }
+
+
+
+
+          if(line.substr(0,1).compare("f")==0){
+
+            int vertex1;
+            int texture1;
+            int normal1;
+            line = line.substr(2);
+            faces_t newFace;
+
+            for(int x=0; x<2; x++){
+             vertex1 = std::stoi(line.substr(0,line.find("/")));
+
+             line = line.substr(line.find("/")+1);
+
+             texture1 = std::stoi(line.substr(0,line.find("/")));
+
+             line = line.substr(line.find("/")+1);
+
+             normal1 =std::stoi(line.substr(0,line.find(" ")));
+
+             line = line.substr(line.find(" ")+1);
+             cout << "vertex: " << vertex1 << "Texture: " << texture1 << "Normal: " << normal1;
+
+             if(x==0){
+               newFace.one = vertex[vertex1];
+               newFace.texture1=textures[texture1];
+               newFace.normal=normals[normal1];
+             }
+             if(x==1){
+              newFace.two=vertex[vertex1];
+              newFace.texture2=textures[texture1];
+            }
+
+
+
+          }
+          vertex1 = std::stoi(line.substr(0,line.find("/")));
+          line = line.substr(line.find("/")+1);
+          texture1 = std::stoi(line.substr(0,line.find("/")));
+          normal1 =std::stoi(line.substr(line.find("/")+1));
+
+          cout << "vertex: " << vertex1 << "Texture: " << texture1 << "Normal: " << normal1 << endl;
+          newFace.three = vertex[vertex1];
+          newFace.texture3=textures[texture1];
+
+
+          faces.push_back(newFace);
+          currentIndexFaces++;
+          numIndicies++;
+
+          
         }
-
-
-
-
-        if(line.substr(0,1).compare("f")==0){
-
-          int vertex1;
-          int texture1;
-          int normal1;
-          line = line.substr(2);
-
-          for(int x=0; x<2; x++){
-           vertex1 = std::stoi(line.substr(0,line.find("/")));
-
-           line = line.substr(line.find("/")+1);
-
-           texture1 = std::stoi(line.substr(0,line.find("/")));
-
-           line = line.substr(line.find("/")+1);
-
-           normal1 =std::stoi(line.substr(0,line.find(" ")));
-
-           line = line.substr(line.find(" ")+1);
-
-           faces[currentIndexFaces] = vertex[vertex1];
-           currentIndexFaces++;
-           faces[currentIndexFaces] = textures[texture1];
-           currentIndexFaces++;
-           faces[currentIndexFaces]= normals[normal1];
-           currentIndexFaces++;
-
-         }
-         vertex1 = std::stoi(line.substr(0,line.find("/")));
-         line = line.substr(line.find("/")+1);
-         texture1 = std::stoi(line.substr(0,line.find("/")));
-         normal1 =std::stoi(line.substr(line.find("/")+1));
-         faces[currentIndexFaces] = vertex[vertex1];
-         currentIndexFaces++;
-         faces[currentIndexFaces] = textures[texture1];
-         currentIndexFaces++;
-         faces[currentIndexFaces]= normals[normal1];
-         currentIndexFaces++;
-         numIndicies++;
-
-       }
 
       //Case for texture
-       else if (line.substr(0,2).compare("vt")==0){
-        line = line.substr(3);
+        else if (line.substr(0,2).compare("vt")==0){
+          textures_t newText;
+          line = line.substr(3);
 
-        point =  std::stof(line.substr(0,line.find(" ")));
-        textures[currentIndexTextures] = point;
-        currentIndexTextures++;
-        line.substr(line.find(" ")+1);
+          point =  std::stof(line.substr(0,line.find(" ")));
+          newText.coorOne = point;
 
-        point = std::stof(line);
-        vertex[currentIndexTextures] = point;
-        currentIndexTextures++;
-       
+          line.substr(line.find(" ")+1);
 
-      }
+          point = std::stof(line);
+          newText.coorTwo = point;
+          textures.push_back(newText);
+          currentIndexTextures++;
+
+
+        }
 
        //Case for normals
-      else if (line.substr(0,2).compare("vn")==0){
+        else if (line.substr(0,2).compare("vn")==0){
+          normals_t newNormal;
+          line = line.substr(3);
+          for(int x=0; x<2; x++){
+            point =  std::stof(line.substr(0,line.find(" ")));
+            if(x==0){
+              newNormal.xcoor= point;
+            }
+            if(x==1){
+              newNormal.ycoor=point;
+            }
 
-        line = line.substr(3);
-        for(int x=0; x<2; x++){
-          point =  std::stof(line.substr(0,line.find(" ")));
-          normals[currentIndexNormals] = point;
+            line.substr(line.find(" ")+1);
+          }
+          point = std::stof(line);
+          newNormal.zcoor = point;
+          normals.push_back(newNormal);
           currentIndexNormals++;
-          line.substr(line.find(" ")+1);
-        }
-        point = std::stof(line);
-        vertex[currentIndexNormals] = point;
-        currentIndexNormals++;
 
-      }
+        }
 
         //Case for the vertex
-      else if(line.substr(0,1).compare("v")==0){
+        else if(line.substr(0,1).compare("v")==0){
+          vertex_t newVertex;
+          line = line.substr(2);
+          for(int x=0; x< 2; x++){
+            point =  std::stof(line.substr(0,line.find(" ")));
+            if(x==0){
+              newVertex.xcoor=point;
+            }
+            if(x==1){
+              newVertex.ycoor=point;
+            }
+            line.substr(line.find(" ")+1);
 
-        line = line.substr(2);
-        for(int x=0; x< 2; x++){
-          point =  std::stof(line.substr(0,line.find(" ")));
-          vertex[currentIndexVertex] = point;
+          }
+          point = std::stof(line);
+          newVertex.zcoor=point;
+          vertex.push_back(newVertex);
           currentIndexVertex++;
-          line.substr(line.find(" ")+1);
-
+          numVertex++;
         }
-        point = std::stof(line);
-        vertex[currentIndexVertex] = point;
-        currentIndexVertex++;
-        numVertex++;
+
+        else{
+          cout << "not a case" << endl;
+        }
+
+
+
+
+
       }
 
-      else{
-        cout << "not a case" << endl;
-      }
-
-
-
-      
-
+      inFile.close();
     }
-
-    inFile.close();
   }
-}
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -447,15 +526,15 @@ void changeToSolid(){
 /// @param _argc Count of command line arguments
 /// @param _argv Command line arguments
 /// @return Application success status
-int
-main(int _argc, char** _argv) {
+  int
+  main(int _argc, char** _argv) {
   //////////////////////////////////////////////////////////////////////////////
   // Initialize GLUT Window
-  std::cout << "Initializing GLUTWindow" << std::endl;
+    std::cout << "Initializing GLUTWindow" << std::endl;
   // GLUT
-  glutInit(&_argc, _argv);
-  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-  glutInitWindowPosition(50, 100);
+    glutInit(&_argc, _argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+    glutInitWindowPosition(50, 100);
   glutInitWindowSize(g_width, g_height); // HD size
   g_window = glutCreateWindow("Spiderling: A Rudamentary Game Engine");
   readFile("theBench.obj");
