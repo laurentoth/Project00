@@ -63,6 +63,9 @@ std::chrono::high_resolution_clock::time_point g_frameTime{
   int currentIndexTextures=1;
   int numVertex=0;
   int numIndicies=0;
+  bool wireFrame=false; 
+  bool pointModel=false;
+  bool solidModel=true;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -176,9 +179,23 @@ std::chrono::high_resolution_clock::time_point g_frameTime{
     // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,indexBufferObject);
     // glBindVertexArray(vao);
     // glDrawElements(GL_TRIANGLES,numIndicies,GL_UNSIGNED_INT,(void*)0);
+   if(wireFrame){
+    glBegin(GL_LINES);
+   }
    
+   if(pointModel){
+    glBegin(GL_POINTS);
     for(int i=1; i<numIndicies; i+=26){
-       glBegin(GL_TRIANGLES);
+      glNormal3f(vertex[i+1],vertex[],vertex[]);
+      glVertex3f(vertex[i],vertex[i+3],vertex[i+6]);
+       glVertex3f(vertex[i+9],vertex[i+12],vertex[i+15]);
+       glVertex3f(vertex[i+18],vertex[i+21],vertex[i+24]);
+
+   }
+   if(solidModel){
+    glBegin(GL_TRIANGLES);
+     for(int i=1; i<numIndicies; i+=26){
+      
       glVertex3f(vertex[i],vertex[i+3],vertex[i+6]);
        glVertex3f(vertex[i+9],vertex[i+12],vertex[i+15]);
        glVertex3f(vertex[i+18],vertex[i+21],vertex[i+24]);
@@ -187,6 +204,9 @@ std::chrono::high_resolution_clock::time_point g_frameTime{
       cout << "vertex: " << vertex[i-2]<< " " <<vertex[i-1]<<" " <<vertex[i] << endl;
          glEnd();
        }
+   }
+   
+   
  
 
  
@@ -223,12 +243,44 @@ std::chrono::high_resolution_clock::time_point g_frameTime{
       glutDestroyWindow(g_window);
       g_window = 0;
       break;
+      case 80:
+      std::cout << "Changing to point model" << endl;
+      changeToPoints();
+      break;
+      
+      case 87:
+      std::cout<<"Changing to WireModel" << endl;
+      changeToWire();
+      break;
+      
+      case 83:
+      std::cout << "Changing to Solid Modle" << endl;
+      changeToSolid();
+      break;
     // Unhandled
       default:
       std::cout << "Unhandled key: " << (int)(_key) << std::endl;
       break;
     }
   }
+
+void changeToPoints(){
+    wireFrame=false; 
+   pointModel=true;
+   solidModel=false;
+}
+
+void changeToWire(){
+    wireFrame=ture; 
+   pointModel=false;
+   solidModel=false;
+}
+
+void changeToSolid(){
+    wireFrame=false; 
+   pointModel=false;
+   solidModel=true;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief Callback function for keyboard presses of special keys
