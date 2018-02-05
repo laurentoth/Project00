@@ -485,6 +485,22 @@ std::chrono::high_resolution_clock::time_point g_frameTime{
     }
   }
 
+  void mainMenuHandler(int choice){
+    switch (choice){
+      case 0:
+      cout << "Woah man" << endl;
+      break;
+
+      case 1:
+      cout<< "Print it " <<endl;
+      break;
+
+      default:
+      cout << "Le default " << endl;
+      break;
+    }
+  }
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Main
@@ -509,6 +525,12 @@ std::chrono::high_resolution_clock::time_point g_frameTime{
 
   // GL
   initialize();
+
+  glutCreateMenu(mainMenuHandler);
+  glutAddMenuEntry("Not Sure",0);
+  glutAddMenuEntry("Did it work",1);
+  glutAttachMenu(GLUT_RIGHT_BUTTON);
+
 
   //////////////////////////////////////////////////////////////////////////////
   // Assign callback functions
