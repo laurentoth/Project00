@@ -129,6 +129,7 @@ GLshort lineStyle=0xFFFF;
   bool wireFrame=false; 
   bool pointModel=false;
   bool solidModel=true;
+  bool textureHere=true;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -225,13 +226,23 @@ GLshort lineStyle=0xFFFF;
        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
       glBegin(GL_LINES);
       for(int i=0; i<currentIndexFaces; i+=1){
-        
+        if(currentIndexNormals==0){
+          calculateNormal(faces[i].normal.xcoor, faces[i].normal.ycoor,faces[i].normal.zcoor);
+        }
+        else{
         glNormal3f(faces[i].normal.xcoor, faces[i].normal.ycoor,faces[i].normal.zcoor);
+        }
+        if(textureHere){
         glTexCoord2f(faces[i].texture1.coorOne,faces[i].texture1.coorTwo);
+        }
         glVertex3f(faces[i].one.xcoor,faces[i].one.ycoor,faces[i].one.zcoor);
+        if(textureHere){
          glTexCoord2f(faces[i].texture2.coorOne,faces[i].texture2.coorTwo);
+         }
         glVertex3f(faces[i].two.xcoor,faces[i].two.ycoor,faces[i].two.zcoor);
+        if(textuureHere){
          glTexCoord2f(faces[i].texture3.coorOne,faces[i].texture3.coorTwo);
+         }
         glVertex3f(faces[i].three.xcoor,faces[i].three.ycoor,faces[i].three.zcoor);
 
         
@@ -405,26 +416,18 @@ GLshort lineStyle=0xFFFF;
             int vertex1;
             int texture1;
             int normal1;
-            bool textureHere;
             line = line.substr(2);
             faces_t newFace;
-
+           
             for(int x=0; x<2; x++){
              vertex1 = std::stoi(line.substr(0,line.find("/")));
-             if(line.charAt(line.find("/")+1).compare('/')){
-              line=line.substr(line.find("/")+2);
-              textureHere=false;
-             }
-             else{
-             line = line.substr(line.find("/")+1);
-             textureHere=true;
-           }
+              line = line.substr(line.find("/")+1);
             
             if(textureHere){
              texture1 = std::stoi(line.substr(0,line.find("/")));
-
-             line = line.substr(line.find("/")+1);
+            
              }
+              line = line.substr(line.find("/")+1);
 
              normal1 =std::stoi(line.substr(0,line.find(" ")));
 
@@ -472,6 +475,7 @@ GLshort lineStyle=0xFFFF;
 
       //Case for texture
         else if (line.substr(0,2).compare("vt")==0){
+          textureHere=true;
           textures_t newText;
           line = line.substr(3);
           std::istringstream in(line);       
@@ -807,6 +811,7 @@ void submenuModel(int choice){
    currentIndexTextures=0;
    numVertex=0;
    numIndicies=0;
+      textureHere=false;
   
     readFile("skull.obj");
     break;
@@ -823,6 +828,7 @@ void submenuModel(int choice){
    currentIndexTextures=0;
    numVertex=0;
    numIndicies=0;
+      textureHere=false;
     readFile("cube.obj");
     break;
 
@@ -838,6 +844,7 @@ void submenuModel(int choice){
    currentIndexTextures=0;
    numVertex=0;
    numIndicies=0;
+      textureHere=false;
     readFile("theBench.obj");
       break;
 
@@ -853,9 +860,29 @@ void submenuModel(int choice){
    currentIndexTextures=0;
    numVertex=0;
    numIndicies=0;
+      textureHere=false;
     readFile("tree.obj");
       break;
   }
+}
+
+Vector<GLfloat>  calculateNormal(Vertex_t one, Vertex_t two, Vertex_t three){
+  Vector<GLfloat> normal;
+  Vector<Glfloat> U;
+  Vector<Glfloat> V;
+  U.push_back(two.xcoor-one.xcoor);
+  U.push_back(two.ycoor-one.ycoor);
+  U.push_back(two.zcoor-one.zcoor);
+  V.push_back(three.xcoor-one.xcoor);
+  V.push_back(three.ycoor-one.ycoor);
+  V.push_back(three.zcoor-one.zcoor);
+  
+  normal.push_back((U[1]*V[2])-(U[2]*V[2]));
+  normal.push_back((U[2]*V[0])-(U[0]*V[2]));
+  normal.push_back((U[0]*V[1])-(U[1]*V[0]));
+  
+  return normal;
+  
 }
 
 
