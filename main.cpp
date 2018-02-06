@@ -85,13 +85,35 @@ std::chrono::high_resolution_clock::time_point g_frameTime{
   float g_delay{0.f};
   float g_framesPerSecond{0.f};
 
-//Color Coordinates
-GLfloat red=0.0;
-GLfloat green=0.0;
-GLfloat blue=0.0;
+//Menu Ints
+  int menuID;
+  int submenuLineStyleID;
+  int submenuColorID;
+  int submenuLineWidthID;
+  int submenuPointSizeID;
+  int submenuBackgroundColorID;
+  int submenuModelID;
+
+
+//Model Color Coordinates
+GLfloat red=0.5;
+GLfloat green=0.5;
+GLfloat blue=0.5;
+
+//Background Color Coordinates
+GLfloat backgroudRed=0.0;
+GLfloat backgroundBlue=0.0;
+GLfloat backgroundGreen=0.0;
+GLfloat backgroundAplha=0.0;
 
 //Point Size
 GLfloat pointSize=1.0;
+
+//Line Size
+GLfloat lineSize =1.0;
+
+//Line Style
+GLshort lineStyle=0xFFFF;
 
 
   vector <vertex_t> vertex;
@@ -116,7 +138,7 @@ GLfloat pointSize=1.0;
 /// @brief Initialize GL settings
   void
   initialize() {
-    glClearColor(0.f, 0.f, 0.4f, 0.f);
+    glClearColor(0.f, 0.4f, 0.6f, 0.f);
     glEnable(GL_COLOR_MATERIAL);
     glEnable(GL_DEPTH_TEST);
   }
@@ -165,6 +187,7 @@ GLfloat pointSize=1.0;
   //////////////////////////////////////////////////////////////////////////////
   // Clear
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClearColor(backgroudRed,backgroundGreen,backgroundBlue,backgroundAplha);
 
   //////////////////////////////////////////////////////////////////////////////
   // Draw
@@ -189,6 +212,11 @@ GLfloat pointSize=1.0;
     glColor3f(red, green, blue);
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+   glEnable(GL_LINE_SMOOTH);
+    glEnable(GL_LINE_STIPPLE);
+    glLineStipple(1,lineStyle);
+    glLineWidth(lineSize);
+    glPointSize(pointSize);
 
 
    
@@ -248,6 +276,8 @@ GLfloat pointSize=1.0;
 
       }
 
+      glDisable(GL_LINE_STIPPLE);
+      glDisable(GL_LINE_SMOOTH);
   //////////////////////////////////////////////////////////////////////////////
   // Show
       glutSwapBuffers();
@@ -361,6 +391,7 @@ GLfloat pointSize=1.0;
         while (getline(inFile,line))
         {
     //If it is a comment
+          cout << line << endl;
 
           if(line.substr(0,1).compare("#")==0){
 
@@ -379,8 +410,12 @@ GLfloat pointSize=1.0;
 
             for(int x=0; x<2; x++){
              vertex1 = std::stoi(line.substr(0,line.find("/")));
-
+             if(line.charAt(line.find("/")+1).compare('/')){
+              line=line.substr(line.find("/")+2);
+             }
+             else{
              line = line.substr(line.find("/")+1);
+           }
 
              texture1 = std::stoi(line.substr(0,line.find("/")));
 
@@ -494,12 +529,17 @@ GLfloat pointSize=1.0;
   void mainMenuHandler(int choice){
     switch (choice){
       case 0:
-      cout << "Woah man" << endl;
+      cout << "Color Menu" << endl;
       break;
 
       case 1:
-      cout<< "Print it " <<endl;
+      cout<< "Line Width" <<endl;
       break;
+
+      case 2:
+      cout << "Changing Line Style"<< endl;
+      break;
+
 
       default:
       cout << "Le default " << endl;
@@ -525,8 +565,8 @@ void submenuColor(int choice){
       case 2: 
       cout << "Yellow" << endl;
       green = 1.0;
-      blue = 1.0;
-      red =0.0;
+      blue = 0.0;
+      red =1.0;
       break;
       case 3: 
       cout << "Green" << endl;
@@ -546,16 +586,16 @@ void submenuColor(int choice){
       blue=1.0;
       green=0.0;
       break;
-    default:
-      cout << "Black" << endl;
-      red=0.0;
-      green =0.0;
-      blue =0.0
+    case 6:
+      cout << "Grey" << endl;
+      red=0.5;
+      green =0.5;
+      blue =0.5;
       break;
 }
 }
   
- void submenuLineWidth(int choice){
+ void submenuPointSize(int choice){
    
    switch(choice){
      case 0:
@@ -579,7 +619,7 @@ cout << "Point Size 3.0" << endl;
        break;
        
      case 4:
-cout << "Point Size 5.0" << endl;
+      cout << "Point Size 5.0" << endl;
        pointSize=5.0;
        break;
        
@@ -587,6 +627,15 @@ cout << "Point Size 5.0" << endl;
 cout << "Point Size 6.0" << endl;
        pointSize=6.0;
        break;
+    case 6:
+    cout << "Point Size 0.1 " << endl;
+    pointSize=0.1;
+    break;
+
+    case 7:
+    cout << "Point Size 0.5" << endl;
+    pointSize=0.5;
+    break;
        
      default:
        cout << "Point Size 2.0" << endl;
@@ -597,6 +646,205 @@ cout << "Point Size 6.0" << endl;
    }
    
  }
+
+
+void submenuLineWidth(int choice){
+   
+   switch(choice){
+     case 0:
+       cout << "Line size 1.0" << endl;
+       lineSize=1.0;
+       break;
+       
+     case 1:
+       cout << "Line Size 2.0"<< endl;
+       lineSize=2.0;
+       break;
+       
+     case 2:
+cout << "Line Size 3.0" << endl;
+       lineSize=3.0;
+       break;
+       
+     case 3:
+       cout << "Line Size 4.0" << endl;
+       lineSize=4.0;
+       break;
+       
+     case 4:
+      cout << "Line Size 5.0" << endl;
+       lineSize=5.0;
+       break;
+       
+     case 5:
+cout << "Line Size 6.0" << endl;
+       lineSize=6.0;
+       break;
+    case 6:
+    cout << "Line Size 0.1 " << endl;
+    lineSize=0.1;
+    break;
+
+    case 7:
+    cout << "Line Size 0.5" << endl;
+    lineSize=0.5;
+    break;
+       
+     default:
+       cout << "Line Size 2.0" << endl;
+       lineSize=2.0;
+       break;
+    
+       
+   }
+   
+ }
+
+
+
+
+
+ void submenuLineStyle(int choice){
+   
+
+switch(choice){
+  case 0:
+  cout << "Line Style changed to Dash-Dot" << endl;
+  lineStyle = 0x1C47;
+  break;
+
+  case 1:
+  cout << "Line Style changed to Dashed" << endl;
+  lineStyle = 0x00FF;
+  break;
+
+  case 2:
+  cout << "Line Style Changed to Dotted" << endl;
+  lineStyle = 0x0101;
+  break;
+
+  case 3:
+  cout << "Line Style changed to solid"<< endl;
+  lineStyle=0xFFFF;
+  break;
+}
+
+ }
+
+
+void submenuBackgroundColor(int choice){
+
+  switch(choice){
+    case 0: 
+      cout << "Red" << endl;
+      backgroudRed =1.0;
+      backgroundBlue =0.0;
+      backgroundGreen =0.0;
+      break;
+      case 1: 
+      cout << "Orange" << endl;
+      backgroudRed =1.0;
+      backgroundGreen =0.5;
+      backgroundBlue =0.0;
+      break;
+      case 2: 
+      cout << "Yellow" << endl;
+      backgroundGreen = 1.0;
+      backgroundBlue = 0.0;
+      backgroudRed =1.0;
+      break;
+      case 3: 
+      cout << "Green" << endl;
+      backgroudRed=0.0;
+      backgroundBlue=0.0;
+      backgroundGreen =1.0;
+      break;
+      case 4: 
+      cout << "Blue" << endl;
+      backgroudRed =0.0;
+      backgroundBlue=1.0;
+      backgroundGreen=1.0;
+      break;
+      case 5: 
+      cout << "Purple" << endl;
+      backgroudRed=1.0;
+      backgroundBlue=1.0;
+      backgroundGreen=0.0;
+      break;
+    case 6:
+      cout << "Black" << endl;
+      backgroudRed=0.0;
+      backgroundGreen =0.0;
+      backgroundBlue =0.0;
+      break;
+}
+}
+
+void submenuModel(int choice){
+
+  switch(choice){
+    case 0:
+    cout << "Skull Model" << endl;
+     vertex.clear();
+  currentIndexVertex=0;
+   normals.clear();
+  currentIndexNormals=0;
+  faces.clear();
+  currentIndexFaces=0;
+  textures.clear();
+   currentIndexTextures=0;
+   numVertex=0;
+   numIndicies=0;
+  
+    readFile("skull.obj");
+    break;
+
+    case 1:
+    cout << "Cube Model" << endl;
+     vertex.clear();
+  currentIndexVertex=0;
+  normals.clear();
+  currentIndexNormals=0;
+  faces.clear();
+  currentIndexFaces=0;
+  textures.clear();
+   currentIndexTextures=0;
+   numVertex=0;
+   numIndicies=0;
+    readFile("cube.obj");
+    break;
+
+    case 2:
+    cout << "Bench Model" << endl;
+     vertex.clear();
+  currentIndexVertex=0;
+  normals.clear();
+  currentIndexNormals=0;
+  faces.clear();
+  currentIndexFaces=0;
+  textures.clear();
+   currentIndexTextures=0;
+   numVertex=0;
+   numIndicies=0;
+    readFile("theBench.obj");
+      break;
+
+       case 3:
+    cout << "Tree Model" << endl;
+     vertex.clear();
+  currentIndexVertex=0;
+  normals.clear();
+  currentIndexNormals=0;
+  faces.clear();
+  currentIndexFaces=0;
+  textures.clear();
+   currentIndexTextures=0;
+   numVertex=0;
+   numIndicies=0;
+    readFile("tree.obj");
+      break;
+  }
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -618,39 +866,81 @@ cout << "Point Size 6.0" << endl;
     glutInitWindowPosition(50, 100);
   glutInitWindowSize(g_width, g_height); // HD size
   g_window = glutCreateWindow("Spiderling: A Rudamentary Game Engine");
+
   readFile("skull.obj");
+
 
   // GL
   initialize();
 
-  glutCreateMenu(mainMenuHandler);
-   int submenuColorID = glutCreateMenu(submenuColor);
+  
+    submenuColorID = glutCreateMenu(submenuColor);
    glutAddMenuEntry("Red",0);
     glutAddMenuEntry("Orange",1);
     glutAddMenuEntry("Yellow",2);
      glutAddMenuEntry("Green",3);
      glutAddMenuEntry("Blue",4);
       glutAddMenuEntry("Purple",5);
-   int submenuLineWidthID= glutCreateMenu(submenuLineWidth);
+      glutAddMenuEntry("Grey",6);
+
+      submenuBackgroundColorID = glutCreateMenu(submenuBackgroundColor);
+   glutAddMenuEntry("Red",0);
+    glutAddMenuEntry("Orange",1);
+    glutAddMenuEntry("Yellow",2);
+     glutAddMenuEntry("Green",3);
+     glutAddMenuEntry("Blue",4);
+      glutAddMenuEntry("Purple",5);
+      glutAddMenuEntry("Black",6);
+
+
+    submenuLineWidthID= glutCreateMenu(submenuLineWidth);
+    glutAddMenuEntry("0.1",6);
+    glutAddMenuEntry("0.5",7);
    glutAddMenuEntry("1.0",0);
     glutAddMenuEntry("2.0",1);
     glutAddMenuEntry("3.0",2);
      glutAddMenuEntry("4.0",3);
      glutAddMenuEntry("5.0",4);
       glutAddMenuEntry("6.0",5);
-   int submenuLineStyleID = glutCreateMenu(submenuLineStyle);
+
+
+       submenuPointSizeID= glutCreateMenu(submenuPointSize);
+    glutAddMenuEntry("0.1",6);
+    glutAddMenuEntry("0.5",7);
+   glutAddMenuEntry("1.0",0);
+    glutAddMenuEntry("2.0",1);
+    glutAddMenuEntry("3.0",2);
+     glutAddMenuEntry("4.0",3);
+     glutAddMenuEntry("5.0",4);
+      glutAddMenuEntry("6.0",5);
+
+    submenuLineStyleID = glutCreateMenu(submenuLineStyle);
      glutAddMenuEntry("Dash-dot",0);
     glutAddMenuEntry("Dashed",1);
     glutAddMenuEntry("Dotted",2);
+    glutAddMenuEntry("Solid",3);
+
+ submenuModelID = glutCreateMenu(submenuModel);
+     glutAddMenuEntry("Skull",0);
+    glutAddMenuEntry("Cube",1);
+    glutAddMenuEntry("Bench",2);
+    glutAddMenuEntry("Tree",3);
+   
+
  
+ menuID =glutCreateMenu(mainMenuHandler);
    
   glutAddSubMenu("Change Color",submenuColorID);
+  glutAddSubMenu("Change Background Color",submenuBackgroundColorID);
   glutAddSubMenu("Line Width",submenuLineWidthID);
   glutAddSubMenu("Change Line Style",submenuLineStyleID);
-  glutAddSubMenu("Exit",3);
+  glutAddSubMenu("Change Point Size",submenuPointSizeID);
+  glutAddSubMenu("Change Model",submenuModelID);
+  
   
  
   glutAttachMenu(GLUT_RIGHT_BUTTON);
+
 
 
   //////////////////////////////////////////////////////////////////////////////

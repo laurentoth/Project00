@@ -1,6 +1,6 @@
 # Blender v2.79 (sub 0) OBJ File: ''
 # www.blender.org
-mtllib lowpolytree.mtl
+mtllib tree.mtl
 o Cylinder
 v 0.015674 2.466367 -0.253986
 v 0.019167 3.227034 0.022685
