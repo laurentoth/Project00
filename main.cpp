@@ -405,6 +405,7 @@ GLshort lineStyle=0xFFFF;
             int vertex1;
             int texture1;
             int normal1;
+            bool textureHere;
             line = line.substr(2);
             faces_t newFace;
 
@@ -412,14 +413,18 @@ GLshort lineStyle=0xFFFF;
              vertex1 = std::stoi(line.substr(0,line.find("/")));
              if(line.charAt(line.find("/")+1).compare('/')){
               line=line.substr(line.find("/")+2);
+              textureHere=false;
              }
              else{
              line = line.substr(line.find("/")+1);
+             textureHere=true;
            }
-
+            
+            if(textureHere){
              texture1 = std::stoi(line.substr(0,line.find("/")));
 
              line = line.substr(line.find("/")+1);
+             }
 
              normal1 =std::stoi(line.substr(0,line.find(" ")));
 
@@ -428,12 +433,16 @@ GLshort lineStyle=0xFFFF;
 
              if(x==0){
                newFace.one = vertex[vertex1-1];
+               if(textureHere){
                newFace.texture1=textures[texture1-1];
+               }
                newFace.normal=normals[normal1-1];
              }
              if(x==1){
               newFace.two=vertex[vertex1-1];
+              if(textureHere){
               newFace.texture2=textures[texture1-1];
+              }
             }
 
 
@@ -441,13 +450,16 @@ GLshort lineStyle=0xFFFF;
           }
           vertex1 = std::stoi(line.substr(0,line.find("/")));
           line = line.substr(line.find("/")+1);
+          if(textureHere){
           texture1 = std::stoi(line.substr(0,line.find("/")));
+            newFace.texture3=textures[texture1-1];
+          }
           normal1 =std::stoi(line.substr(line.find("/")+1));
          
 
          
           newFace.three = vertex[vertex1-1];
-          newFace.texture3=textures[texture1-1];
+        
 
 
           faces.push_back(newFace);
