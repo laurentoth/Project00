@@ -85,7 +85,13 @@ std::chrono::high_resolution_clock::time_point g_frameTime{
   float g_delay{0.f};
   float g_framesPerSecond{0.f};
 
+//Color Coordinates
+GLfloat red=0.0;
+GLfloat green=0.0;
+GLfloat blue=0.0;
 
+//Point Size
+GLfloat pointSize=1.0;
 
 
   vector <vertex_t> vertex;
@@ -180,7 +186,7 @@ std::chrono::high_resolution_clock::time_point g_frameTime{
       0.f, 0.f, 0.f, 0.f, 1.f, 0.f);
 
   // Model of cube
-    glColor3f(0.9f, 0.f, 0.f);
+    glColor3f(red, green, blue);
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -500,6 +506,97 @@ std::chrono::high_resolution_clock::time_point g_frameTime{
       break;
     }
   }
+  
+void submenuColor(int choice){
+
+  switch(choice){
+    case 0: 
+      cout << "Red" << endl;
+      red =1.0;
+      blue =0.0;
+      green =0.0;
+      break;
+      case 1: 
+      cout << "Orange" << endl;
+      red =1.0;
+      green =0.5;
+      blue =0.0;
+      break;
+      case 2: 
+      cout << "Yellow" << endl;
+      green = 1.0;
+      blue = 1.0;
+      red =0.0;
+      break;
+      case 3: 
+      cout << "Green" << endl;
+      red=0.0;
+      blue=0.0;
+      green =1.0;
+      break;
+      case 4: 
+      cout << "Blue" << endl;
+      red =0.0;
+      blue=1.0;
+      green=0.0;
+      break;
+      case 5: 
+      cout << "Purple" << endl;
+      red=1.0;
+      blue=1.0;
+      green=0.0;
+      break;
+    default:
+      cout << "Black" << endl;
+      red=0.0;
+      green =0.0;
+      blue =0.0
+      break;
+}
+}
+  
+ void submenuLineWidth(int choice){
+   
+   switch(choice){
+     case 0:
+       cout << "point size 1.0" << endl;
+       pointSize=1.0;
+       break;
+       
+     case 1:
+       cout << "Point Size 2.0"<< endl;
+       pointSize=2.0;
+       break;
+       
+     case 2:
+cout << "Point Size 3.0" << endl;
+       pointSize=3.0;
+       break;
+       
+     case 3:
+       cout << "Point Size 4.0" << endl;
+       pointSize=4.0;
+       break;
+       
+     case 4:
+cout << "Point Size 5.0" << endl;
+       pointSize=5.0;
+       break;
+       
+     case 5:
+cout << "Point Size 6.0" << endl;
+       pointSize=6.0;
+       break;
+       
+     default:
+       cout << "Point Size 2.0" << endl;
+       pointSize=2.0;
+       break;
+    
+       
+   }
+   
+ }
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -527,8 +624,32 @@ std::chrono::high_resolution_clock::time_point g_frameTime{
   initialize();
 
   glutCreateMenu(mainMenuHandler);
-  glutAddMenuEntry("Not Sure",0);
-  glutAddMenuEntry("Did it work",1);
+   int submenuColorID = glutCreateMenu(submenuColor);
+   glutAddMenuEntry("Red",0);
+    glutAddMenuEntry("Orange",1);
+    glutAddMenuEntry("Yellow",2);
+     glutAddMenuEntry("Green",3);
+     glutAddMenuEntry("Blue",4);
+      glutAddMenuEntry("Purple",5);
+   int submenuLineWidthID= glutCreateMenu(submenuLineWidth);
+   glutAddMenuEntry("1.0",0);
+    glutAddMenuEntry("2.0",1);
+    glutAddMenuEntry("3.0",2);
+     glutAddMenuEntry("4.0",3);
+     glutAddMenuEntry("5.0",4);
+      glutAddMenuEntry("6.0",5);
+   int submenuLineStyleID = glutCreateMenu(submenuLineStyle);
+     glutAddMenuEntry("Dash-dot",0);
+    glutAddMenuEntry("Dashed",1);
+    glutAddMenuEntry("Dotted",2);
+ 
+   
+  glutAddSubMenu("Change Color",submenuColorID);
+  glutAddSubMenu("Line Width",submenuLineWidthID);
+  glutAddSubMenu("Change Line Style",submenuLineStyleID);
+  glutAddSubMenu("Exit",3);
+  
+ 
   glutAttachMenu(GLUT_RIGHT_BUTTON);
 
 
