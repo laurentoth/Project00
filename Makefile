@@ -38,7 +38,7 @@ INCL = $(GL_INCL)
 LIBS = $(GL_LIBS)
 
 OBJS = \
-       main.o
+       main.o Vertex.o Texture.o Normal.o Face.o
 
 EXECUTABLE = spiderling
 

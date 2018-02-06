@@ -1,22 +1,33 @@
 main.o: main.cpp
-main.o: main.cpp
-main.o: main.cpp
-main.o: main.cpp
-main.o: main.cpp
-main.o: main.cpp
-main.o: main.cpp
-main.o: main.cpp
-main.o: main.cpp
-main.o: main.cpp
-main.o: main.cpp
-main.o: main.cpp
-main.o: main.cpp
-main.o: main.cpp
-main.o: main.cpp
-main.o: main.cpp
-main.o: main.cpp
-main.o: main.cpp
-main.o: main.cpp
-main.o: main.cpp
-main.o: main.cpp
-main.o: main.cpp
+main.o: main.cpp vertex.h
+main.o: main.cpp Vertex.h
+Vertex.o: Vertex.cpp Vertex.h
+main.o: main.cpp Vertex.h Texture.h
+main.o: main.cpp Vertex.h Texture.h
+Texture.o: Texture.cpp Texture.h
+main.o: main.cpp Vertex.h Texture.h Normal.h
+Normal.o: Normal.cpp Normal.h
+main.o: main.cpp Vertex.h Texture.h Normal.h Face.h
+Face.o: Face.cpp Face.h Vertex.h Normal.h Texture.h
+main.o: main.cpp Vertex.h Texture.h Normal.h Face.h
+main.o: main.cpp Vertex.h Texture.h Normal.h Face.h
+Normal.o: Normal.cpp Normal.h Vertex.h
+Face.o: Face.cpp Face.h Vertex.h Normal.h Texture.h
+main.o: main.cpp Vertex.h Texture.h Normal.h Face.h
+main.o: main.cpp Vertex.h Texture.h Normal.h Face.h
+main.o: main.cpp Vertex.h Texture.h Normal.h Face.h
+main.o: main.cpp Vertex.h Texture.h Normal.h Face.h
+main.o: main.cpp Vertex.h Texture.h Normal.h Face.h
+main.o: main.cpp Vertex.h Texture.h Normal.h Face.h
+main.o: main.cpp Vertex.h Texture.h Normal.h Face.h
+main.o: main.cpp Vertex.h Texture.h Normal.h Face.h
+main.o: main.cpp Vertex.h Texture.h Normal.h Face.h
+main.o: main.cpp Vertex.h Texture.h Normal.h Face.h
+main.o: main.cpp Vertex.h Texture.h Normal.h Face.h
+main.o: main.cpp Vertex.h Texture.h Normal.h Face.h
+main.o: main.cpp Vertex.h Texture.h Normal.h Face.h
+main.o: main.cpp Vertex.h Texture.h Normal.h Face.h
+main.o: main.cpp Vertex.h Texture.h Normal.h Face.h
+main.o: main.cpp Vertex.h Texture.h Normal.h Face.h
+main.o: main.cpp Vertex.h Texture.h Normal.h Face.h
+main.o: main.cpp Vertex.h Texture.h Normal.h Face.h
