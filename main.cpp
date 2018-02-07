@@ -57,7 +57,7 @@ std::chrono::high_resolution_clock::time_point g_frameTime{
   float g_delay{0.f};
   float g_framesPerSecond{0.f};
 
-//Menu Ints
+//Menu Ids
   int menuID;
   int submenuLineStyleID;
   int submenuColorID;
@@ -87,7 +87,7 @@ std::chrono::high_resolution_clock::time_point g_frameTime{
 //Line Style
   GLshort lineStyle=0xFFFF;
 
-
+//Creating the variables for the vectors for face, Normals, Textures, and Vertexs
   vector <Vertex> v;
   int currentIndexVertex=0;
   vector <Normal> normals;
@@ -184,6 +184,7 @@ std::chrono::high_resolution_clock::time_point g_frameTime{
   // Model of cube
     glColor3f(red, green, blue);
 
+    //Enables the basic drawing functions using user input functions
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glEnable(GL_LINE_SMOOTH);
     glEnable(GL_LINE_STIPPLE);
@@ -192,51 +193,58 @@ std::chrono::high_resolution_clock::time_point g_frameTime{
     glPointSize(pointSize);
 
 
-
+//If the user wants a wire frame
     if(wireFrame){
      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
      glBegin(GL_LINES);
    }
 
 
-
+//If the user wants the points model
    if(pointModel){
     glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
     glBegin(GL_POINTS);
   }
 
 
-
+//If the user wants a normal model looking if triangular faces or Quads
   if(solidModel){
    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+   if(!(faces[1].isTriangle())){
+    glBegin(GL_QUADS);
+  }
+  else{
    glBegin(GL_TRIANGLES);
  }
+ }
 
- for(int i=0; i<currentIndexFaces; i++){
 
-  if(currentIndexNormals==0){
-    Normal *n;
-    n->calculateNormal(faces[i].getV1(),faces[i].getV2(),faces[i].getV3());
-     glNormal3f(n->getX(), n->getY(),n->getZ());
-    
-  }
+//Loops through and constructs all the faces of the model
+ for(int i=0; i<currentIndexFaces; i++){ 
 
-  else{
-  glNormal3f(faces[i].getNormal().getX(), faces[i].getNormal().getY(),faces[i].getNormal().getZ());
-}
+        //Calculates the normals if not given in File
+        if(currentIndexNormals==0){
+          Normal *n;
+          n->calculateNormal(faces[i].getV1(),faces[i].getV2(),faces[i].getV3());
+           glNormal3f(n->getX(), n->getY(),n->getZ());
+          
+        }
 
-  glTexCoord2f(faces[i].getT1().getX(),faces[i].getT1().getY());
-  glVertex3f(faces[i].getV1().getX(),faces[i].getV1().getY(),faces[i].getV1().getZ());
-  glTexCoord2f(faces[i].getT2().getX(),faces[i].getT2().getY());
-  glVertex3f(faces[i].getV2().getX(),faces[i].getV2().getY(),faces[i].getV2().getZ());
-  glTexCoord2f(faces[i].getT3().getX(),faces[i].getT3().getY());
-  glVertex3f(faces[i].getV3().getX(),faces[i].getV3().getY(),faces[i].getV3().getZ());
+        else{
+        glNormal3f(faces[i].getNormal().getX(), faces[i].getNormal().getY(),faces[i].getNormal().getZ());
+      }
 
-  if(!(faces[i].isTriangle())){
-    cout << "here" << endl;
-    glTexCoord2f(faces[i].getT4().getX(),faces[i].getT4().getY());
-  glVertex3f(faces[i].getV4().getX(),faces[i].getV4().getY(),faces[i].getV4().getZ());
-  }
+        glTexCoord2f(faces[i].getT1().getX(),faces[i].getT1().getY());
+        glVertex3f(faces[i].getV1().getX(),faces[i].getV1().getY(),faces[i].getV1().getZ());
+        glTexCoord2f(faces[i].getT2().getX(),faces[i].getT2().getY());
+        glVertex3f(faces[i].getV2().getX(),faces[i].getV2().getY(),faces[i].getV2().getZ());
+        glTexCoord2f(faces[i].getT3().getX(),faces[i].getT3().getY());
+        glVertex3f(faces[i].getV3().getX(),faces[i].getV3().getY(),faces[i].getV3().getZ());
+
+        if(!(faces[i].isTriangle())){
+          glTexCoord2f(faces[i].getT4().getX(),faces[i].getT4().getY());
+          glVertex3f(faces[i].getV4().getX(),faces[i].getV4().getY(),faces[i].getV4().getZ());
+        }
 
 }
 glEnd();
@@ -260,7 +268,7 @@ g_framesPerSecond = 1.f/(g_delay + g_frameRate);
 }
 
 
-
+//Helper Methods used to change between the types of models
 void changeToPoints(){
   wireFrame=false; 
   pointModel=true;
@@ -338,10 +346,7 @@ specialKeyPressed(GLint _key, GLint _x, GLint _y) {
   }
 }
 
-
-
-//Read File
-
+//Parser Method that takes the filename in and parses as needed
 void readFile(std::string filename){
   ifstream inFile;
 
@@ -349,185 +354,154 @@ void readFile(std::string filename){
     cout << "File is not supported please provide an obj file" << endl;
 
   }
+
   else{
+          inFile.open(filename.c_str());
+          string line;
+          GLfloat point;
 
-    inFile.open(filename.c_str());
-    string line;
-    GLfloat point;
+      while (getline(inFile,line))
+      {        
+            if(line.substr(0,1).compare("f")==0){
 
-    while (getline(inFile,line))
-    {
-  
-      if(line.substr(0,1).compare("f")==0){
+                          int vertex1;
+                          int texture1;
+                          int normal1;
+                          line = line.substr(2);
+                          int count=0;                       
+                          Face newFace;
+                          //Counts how many pairs are there
+                          for(int i=0; i<line.size(); i++){
+                            if(line[i]=='/')
+                              count++;
+                          }                 
+                        
+                          for(int x=0; x<2; x++){
+                               vertex1 = std::stoi(line.substr(0,line.find("/")));
+                               line = line.substr(line.find("/")+1);
 
-        int vertex1;
-        int texture1;
-        int normal1;
-        line = line.substr(2);
-        int count;
-        
+                               if(textureHere){
+                                 texture1 = std::stoi(line.substr(0,line.find("/")));
+                                }
 
-        Face newFace;
-        for(int i=0; i<line.size(); i++){
-          if(line[i]=='/')
-            count++;
-        }
-       
-     
+                               line = line.substr(line.find("/")+1);
+                               normal1 =std::stoi(line.substr(0,line.find(" ")));
+                               line = line.substr(line.find(" ")+1);
+                            
+                                if(x==0){
+                                  newFace.setV1(v[vertex1-1]);
+                                  if(textureHere){
+                                     newFace.setT1(textures[texture1-1]);
+                                  }
+                                   newFace.setNormal(normals[normal1-1]);
+                               }
 
-      
-        for(int x=0; x<2; x++){
-         vertex1 = std::stoi(line.substr(0,line.find("/")));
-         line = line.substr(line.find("/")+1);
+                               if(x==1){
+                                  newFace.setV2(v[vertex1-1]);
+                                if(textureHere){
+                                  newFace.setT2(textures[texture1-1]);
+                                }
+                              }
 
-         if(textureHere){
-           texture1 = std::stoi(line.substr(0,line.find("/")));
+                           }
 
-         }
-         line = line.substr(line.find("/")+1);
+                          vertex1 = std::stoi(line.substr(0,line.find("/")));
+                          line = line.substr(line.find("/")+1);
+                          if(textureHere){
+                              texture1 = std::stoi(line.substr(0,line.find("/")));
+                             newFace.setT3(textures[texture1-1]);
+                          }
+                           normal1 =std::stoi(line.substr(line.find("/")+1));
+                          newFace.setV3(v[vertex1-1]);
+                          newFace.setIsTriangle(true);
+                        
+                        if(count>6){    
+                          newFace.setIsTriangle(false);
+                          line = line.substr(line.find(" ")+1);
+                          vertex1 = std::stoi(line.substr(0,line.find("/")));
+                        line = line.substr(line.find("/")+1);
+                        if(textureHere){
+                          texture1 = std::stoi(line.substr(0,line.find("/")));
+                          newFace.setT4(textures[texture1-1]);
+                        }
+                        normal1 =std::stoi(line.substr(line.find("/")+1));
+                         newFace.setV4(v[vertex1-1]);
+                        }
 
-         normal1 =std::stoi(line.substr(0,line.find(" ")));
+                        faces.push_back(newFace);
+                        currentIndexFaces++;
+                        numIndicies++;
+          
+                 }
 
-         line = line.substr(line.find(" ")+1);
+            //Case for texture
+        else if (line.substr(0,2).compare("vt")==0){
+                  textureHere=true;
+                  Texture newText;
+                  line = line.substr(3);
+                  std::istringstream in(line);
+                  float point;
 
+                  in>>point;
+                  newText.setX(point);   
+                  in>>point;
+                  newText.setY(point);
+                  textures.push_back(newText);
+                  currentIndexTextures++;
 
-         if(x==0){
-           newFace.setV1(v[vertex1-1]);
-           if(textureHere){
-             newFace.setT1(textures[texture1-1]);
-           }
-           newFace.setNormal(normals[normal1-1]);
-         }
-
-         if(x==1){
-          newFace.setV2(v[vertex1-1]);
-          if(textureHere){
-            newFace.setT2(textures[texture1-1]);
           }
+
+             //Case for normals
+          else if (line.substr(0,2).compare("vn")==0){
+                  Normal newNormal;
+                  line = line.substr(3);
+                  std::istringstream in(line);
+                  float point;
+                  for(int x=0; x<2; x++){
+
+                    if(x==0){
+                      in >>point;
+                      newNormal.setX(point);
+                    }
+                    if(x==1){
+                      in >>point;
+                      newNormal.setY(point);
+                    }
+                  }
+                  in>>point;
+                  newNormal.setZ(point);
+                  normals.push_back(newNormal);
+                  currentIndexNormals++;
+          }
+
+              //Case for the vertex
+          else if(line.substr(0,1).compare("v")==0){
+                    Vertex newVertex;
+                    line = line.substr(2);
+                    std::istringstream in(line);
+                    float point;
+                    for(int x=0; x< 2; x++){
+                      if(x==0){
+                        in>>point;
+                        newVertex.setX(point);
+                      }
+                      if(x==1){
+                       in>>point;
+                       newVertex.setY(point);
+                     }
+                   }
+                   in>>point;
+                   newVertex.setZ(point);
+                   v.push_back(newVertex);                   
+                   currentIndexVertex++;
+                   numVertex++;
+         }
         }
-
-      }
-
-      vertex1 = std::stoi(line.substr(0,line.find("/")));
-      line = line.substr(line.find("/")+1);
-      if(textureHere){
-        texture1 = std::stoi(line.substr(0,line.find("/")));
-        newFace.setT3(textures[texture1-1]);
-      }
-      normal1 =std::stoi(line.substr(line.find("/")+1));
-      newFace.setV3(v[vertex1-1]);
-      newFace.setIsTriangle(true);
-   
-
-
-      if(count>7){
-        cout << line << endl;
-        newFace.setIsTriangle(false);
-        vertex1 = std::stoi(line.substr(0,line.find("/")));
-      line = line.substr(line.find("/")+1);
-      if(textureHere){
-        texture1 = std::stoi(line.substr(0,line.find("/")));
-        newFace.setT4(textures[texture1-1]);
-      }
-      normal1 =std::stoi(line.substr(line.find("/")+1));
-       newFace.setV4(v[vertex1-1]);
-      
-
-      }
-
-
-
-      faces.push_back(newFace);
-      currentIndexFaces++;
-      numIndicies++;
-      count=0;
-
-
-
+  inFile.close();
     }
-
-      //Case for texture
-    else if (line.substr(0,2).compare("vt")==0){
-      textureHere=true;
-      Texture newText;
-      line = line.substr(3);
-      std::istringstream in(line);
-      float point;
-
-      in>>point;
-      newText.setX(point);   
-      in>>point;
-      newText.setY(point);
-      textures.push_back(newText);
-      currentIndexTextures++;
-
-    }
-
-       //Case for normals
-    else if (line.substr(0,2).compare("vn")==0){
-      Normal newNormal;
-      line = line.substr(3);
-      std::istringstream in(line);
-      float point;
-      for(int x=0; x<2; x++){
-
-        if(x==0){
-          in >>point;
-          newNormal.setX(point);
-        }
-        if(x==1){
-          in >>point;
-          newNormal.setY(point);
-        }
-
-
-      }
-
-
-      in>>point;
-      newNormal.setZ(point);
-      normals.push_back(newNormal);
-      currentIndexNormals++;
-
-    }
-
-        //Case for the vertex
-    else if(line.substr(0,1).compare("v")==0){
-      Vertex newVertex;
-      line = line.substr(2);
-      std::istringstream in(line);
-      float point;
-      for(int x=0; x< 2; x++){
-        if(x==0){
-
-          in>>point;
-          newVertex.setX(point);
-        }
-        if(x==1){
-         in>>point;
-         newVertex.setY(point);
-
-       }
-     }
-
-     in>>point;
-     newVertex.setZ(point);
-     v.push_back(newVertex);
-     currentIndexVertex++;
-     numVertex++;
-   }
-
-   else{
-    cout << "not a case" << endl;
-  }
-
-
 }
 
-inFile.close();
-}
-}
-
+//Creates the Main Menu
 void mainMenuHandler(int choice){
   switch (choice){
     case 0:
@@ -549,6 +523,7 @@ void mainMenuHandler(int choice){
   }
 }
 
+//SubMenu for Model Color
 void submenuColor(int choice){
 
   switch(choice){
@@ -597,6 +572,7 @@ void submenuColor(int choice){
   }
 }
 
+//SubMenu for Point Size
 void submenuPointSize(int choice){
 
  switch(choice){
@@ -649,7 +625,7 @@ void submenuPointSize(int choice){
 
 }
 
-
+//SubMenu for Line Width
 void submenuLineWidth(int choice){
 
  switch(choice){
@@ -702,13 +678,8 @@ void submenuLineWidth(int choice){
 
 }
 
-
-
-
-
+//SubMenu for Line Style
 void submenuLineStyle(int choice){
-
-
   switch(choice){
     case 0:
     cout << "Line Style changed to Dash-Dot" << endl;
@@ -733,7 +704,7 @@ void submenuLineStyle(int choice){
 
 }
 
-
+//SubMenu for Background Color
 void submenuBackgroundColor(int choice){
 
   switch(choice){
@@ -782,12 +753,9 @@ void submenuBackgroundColor(int choice){
   }
 }
 
+//SubMenu for Which Model
 void submenuModel(int choice){
-
-  switch(choice){
-    case 0:
-    cout << "Skull Model" << endl;
-    v.clear();
+  v.clear();
     currentIndexVertex=0;
     normals.clear();
     currentIndexNormals=0;
@@ -798,73 +766,37 @@ void submenuModel(int choice){
     numVertex=0;
     numIndicies=0;
     textureHere=false;
-
-    readFile("skull.obj");
+  switch(choice){
+    case 0:
+    cout << "Bench Model" << endl;
+    readFile("theBench.obj");
     break;
 
     case 1:
     cout << "Cube Model" << endl;
-    v.clear();
-    currentIndexVertex=0;
-    normals.clear();
-    currentIndexNormals=0;
-    faces.clear();
-    currentIndexFaces=0;
-    textures.clear();
-    currentIndexTextures=0;
-    numVertex=0;
-    numIndicies=0;
-    textureHere=false;
     readFile("cube.obj");
     break;
 
     case 2:
-    cout << "Bench Model" << endl;
-    v.clear();
-    currentIndexVertex=0;
-    normals.clear();
-    currentIndexNormals=0;
-    faces.clear();
-    currentIndexFaces=0;
-    textures.clear();
-    currentIndexTextures=0;
-    numVertex=0;
-    numIndicies=0;
-    textureHere=false;
-    readFile("theBench.obj");
+    cout << "Skull Model" << endl;
+    readFile("skull.obj");
     break;
 
     case 3:
     cout << "Tree Model" << endl;
-    v.clear();
-    currentIndexVertex=0;
-    normals.clear();
-    currentIndexNormals=0;
-    faces.clear();
-    currentIndexFaces=0;
-    textures.clear();
-    currentIndexTextures=0;
-    numVertex=0;
-    numIndicies=0;
-    textureHere=false;
     readFile("tree.obj");
     break;
 
     case 4:
     cout << "Pencil Model" << endl;
-    v.clear();
-    currentIndexVertex=0;
-    normals.clear();
-    currentIndexNormals=0;
-    faces.clear();
-    currentIndexFaces=0;
-    textures.clear();
-    currentIndexTextures=0;
-    numVertex=0;
-    numIndicies=0;
-    textureHere=false;
     readFile("pencil.obj");
     break;
+
+    case 5:
+    cout << "Palm Model" << endl;
+    readFile("palm.obj");
+    break;
+
   }
 }
 
@@ -888,7 +820,7 @@ main(int _argc, char** _argv) {
   glutInitWindowSize(g_width, g_height); // HD size
   g_window = glutCreateWindow("Spiderling: A Rudamentary Game Engine");
 
-  readFile("skull.obj");
+  readFile("theBench.obj");
 
 
   // GL
@@ -942,11 +874,13 @@ main(int _argc, char** _argv) {
   glutAddMenuEntry("Solid",3);
 
   submenuModelID = glutCreateMenu(submenuModel);
-  glutAddMenuEntry("Skull",0);
+  glutAddMenuEntry("Skull",2);
   glutAddMenuEntry("Cube",1);
-  glutAddMenuEntry("Bench",2);
+  glutAddMenuEntry("Bench",0);
   glutAddMenuEntry("Tree",3);
   glutAddMenuEntry("Pencil",4);
+  glutAddMenuEntry("Palm",5);
+
 
 
 
